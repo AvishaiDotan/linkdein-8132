@@ -1,6 +1,6 @@
 <template>
     <main class="app-home d-flex flex-column">
-        <p class="home-p p-1">
+        <p class="home-p  p-3 c-1 f-4">
             <strong> גדוד 8132</strong>
             <span>&nbsp;</span>
             <span>
@@ -8,7 +8,7 @@
             </span>
         </p>
         <AppHero />
-        <p class="home-p p-2" style="direction: rtl;">
+        <p class="home-p p-1 f-3  c-2" style="direction: rtl;">
             <span>כאן תוכלו</span>
             <span>&nbsp;</span>
             <span>למצוא עזרה</span>
@@ -46,22 +46,6 @@ var router = useRouter();
     }
 }
 
-.home-p {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    &.p-1 {
-        height: 200px;
-        font-size: 2rem;
-        background-color: #6fa6dc;
-    }
-
-    &.p-2 {
-        font-size: 1.2rem;
-        background-color: #e1ec91;
-    }
-}
 
 
 </style>

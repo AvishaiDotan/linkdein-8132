@@ -1,21 +1,19 @@
 <template>
     <div>
         <p class="home-p p-1 f-3  c-2" style="direction: rtl;">
-            <span>כאן תוכלו</span>
             <span>&nbsp;</span>
-            <span>למצוא עזרה</span>
+            <span>אנחנו שומרים על הפרטים שלכם</span>
             <span>&nbsp;</span>
-            <strong>בכל נושא</strong>
+            <strong>הכל טוב</strong>
             <span>&nbsp;</span>
-            <span>שרק תרצו</span>
         </p>
     </div>
+
+
 </template>
 
-<script>
-    export default {
-        
-    }
+<script setup>
+import { callNumber } from '../services/util.service.js'
 </script>
 
 <style lang="scss" scoped>
