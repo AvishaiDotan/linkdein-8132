@@ -11,16 +11,26 @@
                     <el-button :icon="Search" />
                 </template>
             </el-input>
+            <el-button @click="() => tableData.value = rowtableData.value">Clear</el-button>
+
         </div>
-        <div class="tags-container">
-            <el-tag v-for="skill in filters.value" :key="skill.key" :type="skill.type" class="mx-1"
-                :disable-transitions="false" @close="onSearch(skill.text)">
-                {{ skill.text }}
-            </el-tag>
+        <div class="tags-container d-flex justify-content-center align-items-center">
+            <div class="align-items-center d-flex flex-wrap gap-1 justify-content-center text-center w-75">
+                <el-tag v-for="skill in getRandomValuesFromList(filters.value)" :key="skill" :type="skill.type" class="mx-1 cursor-pointer"
+                    :disable-transitions="false" @click="onSearch(skill.text)">
+                    {{ skill.text }}
+                </el-tag>
+            </div>
         </div>
+        <div class="tags-container d-flex justify-content-center align-items-center">
+            <div class="align-items-center d-flex flex-wrap gap-1 justify-content-center text-center w-75">
+
+            </div>
+        </div>
+
         <div class="table-wrapper">
 
-            <el-table :data="tableData.value" table-layout="auto">
+            <el-table :data="tableData.value" table-layout="auto" height="400px">
                 <el-table-column fixed prop="fullName" label="שם" sortable />
                 <el-table-column prop="fieldsOfInterest" label="יכול לעזור ב">
                     <template #default="scope">
@@ -30,7 +40,11 @@
                         </el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column prop="phoneNumber" label="מספר" />
+                <el-table-column prop="phoneNumber" label="מספר">
+                    <template #default="scope">
+                        <span style="cursor: pointer;" @click="() => callNumber(scope.row.phoneNumber)">{{scope.row.phoneNumber}}</span>
+                    </template>
+                </el-table-column>
                 <!-- <el-table-column fixed="right" label="Operations" width="120">
                 <template #default>
                     <el-button link type="primary" size="small">העלה בדרגה</el-button>
@@ -47,6 +61,7 @@ import styledThinRow from './styled-thin-row.vue'
 import { Search } from '@element-plus/icons-vue'
 import { read } from "../services/board.service"
 import { reactive, onMounted, ref, isProxy, toRaw } from 'vue'
+import {callNumber} from '../services/util.service';
 const tableData = reactive({
     value: ''
 })
@@ -66,15 +81,14 @@ const getData = async () => {
     const { users } = await read();
 
     users.forEach(u => {
-        u.fieldsOfInterest = u.fieldsOfInterest.map(f => ({
+        u.fieldsOfInterest = u.fieldsOfInterest.split(",").map(f => ({
             key: itemIterator.next().value?.label,
             type: itemIterator.next().value?.type,
             text: f
         }));
     });
-
+    
     rowtableData.value = tableData.value = users;
-
 };
 
 
@@ -82,23 +96,10 @@ onMounted(async () => {
     await getData();
     extractCanHelpWithValues(tableData.value)
 })
-var counter = 0
 const filterTag = (value, row) => {
-    if (toRaw(row).fieldsOfInterest.some(f => f.text === value)) {
-        console.log(toRaw(row).fieldsOfInterest.map(f => f.text).join(","), value);
-        var d = toRaw(row).fieldsOfInterest.find(f => f.text === value)
-        console.log(d);
-
-    }
-
-    return toRaw(row).fieldsOfInterest.some(f => f.text === value)
 
 }
 
-function hasMatchingValue(obj, value) {
-
-    return true; // No match found, return false
-}
 
 const items = [
     { type: '', label: 'Tag 1' },
@@ -121,20 +122,31 @@ function* iterateItems() {
 const itemIterator = iterateItems();
 
 const extractCanHelpWithValues = (data) => {
+    
     const result = [];
 
-    data.forEach(item => {
-        const helpWithArray = item?.fieldsOfInterest ?? [];
+    data.forEach(i => {
+                i.fieldsOfInterest.forEach(t => {
+                    result.push({
+                        text: t.text,
+                        value: t.text,
 
-        helpWithArray.forEach(helpWith => {
-            result.push({
-                text: helpWith.text, value: helpWith.text, key: itemIterator.next().value?.label,
-                type: itemIterator.next().value?.type,
-            });
-        });
-    });
+                    })
+                })
+            })
+        ;
+
 
     filters.value = result;
+}
+
+function getRandomValuesFromList(list) {
+    if (!Array.isArray(list) || list.length < 7) {
+        throw new Error('Input must be an array with at least 7 elements');
+    }
+
+    const shuffledList = [...list].sort(() => Math.random() - 0.5);
+    return shuffledList.slice(0, 7);
 }
 </script>
 
@@ -144,5 +156,12 @@ const extractCanHelpWithValues = (data) => {
     justify-content: center;
     align-items: center;
     margin-block: 49px;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+.el-table__inner-wrapper, .el-table--fit {
+    height: calc(100vh - 230px) !important;
 }
 </style>

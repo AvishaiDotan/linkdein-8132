@@ -18,7 +18,7 @@
 
                     <p>כאן אתה יכול לערוך את סט הכישורים</p>
                     <div class="tags-container">
-                        <el-tag v-for="skill in user.fieldOfInterest" :key="itemIterator.next().value?.label" class="mx-1"
+                        <el-tag v-for='skill in user.fieldsOfInterest.split(",")' :key="itemIterator.next().value?.label" class="mx-1"
                             closable :disable-transitions="false" @close="handleClose(skill)">
                             {{ skill }}
                         </el-tag>
@@ -47,7 +47,7 @@ import type { FormInstance } from 'element-plus'
 import { nextTick, ref } from 'vue'
 import { ElInput } from 'element-plus'
 
-import { getLocalStorage } from "../services/localStorage.service"
+import { getLocalStorage, setLocalStorage } from "../services/localStorage.service"
 import { putUser  } from "../services/user.service"
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { Action } from 'element-plus'
@@ -93,7 +93,9 @@ const inputVisible = ref(false)
 const InputRef = ref<InstanceType<typeof ElInput>>()
 
 const handleClose = (skill: string) => {
-    user.fieldOfInterest = user.fieldOfInterest.filter(f => f !== skill)
+    // console.log(user.fieldsOfInterest, skill);
+    user.value.fieldsOfInterest = user.value?.fieldsOfInterest?.split(",")?.filter(f => f !== skill && f !== "").join(",")
+    
 }
 
 const showInput = () => {
@@ -105,23 +107,24 @@ const showInput = () => {
 
 const handleInputConfirm = () => {
     if (inputValue.value) {
-        user.fieldOfInterest.push(inputValue.value)
+        user.value.fieldsOfInterest += "," + (inputValue.value)
     }
     inputVisible.value = false
     inputValue.value = ''
 }
 const formRef = ref<FormInstance>()
-const user = reactive(getLocalStorage("linkedin8132user")?.cleanUser)
+const user = ref(getLocalStorage("linkedin8132user")?.cleanUser)
 
 
 const submitForm = (formEl: FormInstance | undefined) => {
-    const data = `${newInterest.data}`
-    user.fieldOfInterest = [...user.fieldOfInterest, data]
+    const data = `${newInterest.data},${user.fieldsOfInterest}`
+    user.fieldsOfInterest = data
     newInterest.data = ""
 }
 
 const OnputUser = async () => {
-    await putUser(user)
+    await putUser(user.value)
+    setLocalStorage("linkedin8132user", {cleanUser: user.value})
 }
 
 const newInterest = reactive({ data: "" })

@@ -11,6 +11,15 @@ function getCookie() {
     return getLocalStorage(cookieKey)
 }
 
+async function changePasword(pass, userId) {
+    try {
+        setAuthToken()
+        var ok = await post("changePassword", { userId, password: pass })
+        return true;
+    } catch (error) {
+        throw error;
+    }
+}
 
 async function login(userId, password) {
     try {
@@ -49,4 +58,4 @@ async function authenticateUser() {
 }
 
 
-export { authenticateUser, isThereUser, login, putUser };
+export { authenticateUser, isThereUser, login, putUser, changePasword };
